@@ -1,11 +1,12 @@
 name: Trailing Whitespace
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
+  workflow_call:
+    inputs:
+      fail-on-error:
+        required: false
+        type: boolean
+        default: true
 jobs:
   lint-trailing:
     runs-on: ubuntu-latest
