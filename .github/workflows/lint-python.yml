@@ -39,7 +39,7 @@ jobs:
         run: |
           echo "Running Ruff lint..."
           ruff check . --output-format=github
-          
+
           echo "Running Ruff format check..."
           ruff format --check .
 

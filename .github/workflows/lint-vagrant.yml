@@ -28,7 +28,7 @@ jobs:
       - name: Validate Vagrantfile
         run: |
           echo "Validating Vagrantfile syntax..."
-          
+
           if [ ! -f Vagrantfile ]; then
             echo "No Vagrantfile found. Skipping."
             exit 0
