@@ -1,24 +1,11 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# Bandit is a security linter designed to find common security issues in Python code.
-# This action will run Bandit on your codebase.
-# The results of the scan will be found under the Security tab of your repository.
-
-# https://github.com/marketplace/actions/bandit-scan is ISC licensed, by abirismyname
-# https://pypi.org/project/bandit/ is Apache v2.0 licensed, by PyCQA
-
 name: Bandit
 on:
-  push:
-    branches: [ $default-branch, $protected-branches ]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ $default-branch ]
-  schedule:
-    - cron: $cron-weekly
+  workflow_call:
+    inputs:
+      fail-on-error:
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   bandit:
