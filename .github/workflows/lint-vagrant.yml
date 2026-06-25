@@ -19,7 +19,7 @@ jobs:
 
       - name: Install Vagrant
         run: |
-          echo "Installing Vagrant..."
+          echo "🔧 Installing Vagrant..."
           wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
           echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
           sudo apt-get update
@@ -30,11 +30,10 @@ jobs:
           echo "Validating Vagrantfile syntax..."
           
           if [ ! -f Vagrantfile ]; then
-            echo "No Vagrantfile found in root directory. Skipping validation."
+            echo "No Vagrantfile found. Skipping."
             exit 0
           fi
 
-          # Validación oficial de Vagrant
           if vagrant validate; then
             echo "Vagrantfile is valid!"
           else
@@ -43,9 +42,3 @@ jobs:
               exit 1
             fi
           fi
-
-      - name: Check Vagrantfile with Ruby syntax (extra)
-        run: |
-          echo "Running additional Ruby syntax check..."
-          sudo apt-get install -y ruby-full
-          ruby -c Vagrantfile 2>&1 | grep -q "Syntax OK" && echo "Ruby syntax OK" || echo "Ruby syntax check had issues"
