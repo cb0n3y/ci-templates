@@ -1,1 +1,64 @@
----
+name: Lint Python
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: false
+        type: string
+        default: '3.12-slim'
+      fail-on-error:
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  lint-python:
+    name: Lint Python
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          # Instalar herramientas de linting
+          pip install ruff bandit mypy
+
+      - name: Run Ruff (Lint + Format)
+        run: |
+          echo "Running Ruff lint..."
+          ruff check . --output-format=github
+          
+          echo "Running Ruff format check..."
+          ruff format --check .
+
+      - name: Run Bandit (Security Scan)
+        run: |
+          echo "Running Bandit security scan..."
+          bandit -r . --severity-level high --confidence-level high || true
+
+      - name: Run MyPy (Type Checking) - Optional
+        run: |
+          echo "Running MyPy (type checking)..."
+          if [ -f pyproject.toml ] || [ -f setup.py ] || [ -f mypy.ini ]; then
+            mypy . --ignore-missing-imports || true
+          else
+            echo "MyPy config not found, skipping..."
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "Python linting workflow completed"

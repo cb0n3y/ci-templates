@@ -7,8 +7,8 @@ on:
     inputs:
       python-version:
         required: false
-        type: string
-        default: '3.12'
+        type: boolean
+        default: true
 
 jobs:
   lint:
