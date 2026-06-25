@@ -3,7 +3,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![GitHub Repo Size](https://img.shields.io/github/repo-size/cb0n3y/ci-templates)
 ![Last Commit](https://img.shields.io/github/last-commit/cb0n3y/ci-templates)
-[![.github/workflows/ci.yml](https://github.com/cb0n3y/ci-templates/actions/workflows/ci.yml/badge.svg)](https://github.com/cb0n3y/the-road-to-devops/actions/workflows/ci.yml)
+[![.github/workflows/ci.yml](https://github.com/cb0n3y/ci-templates/actions/workflows/ci.yml/badge.svg)](https://github.com/cb0n3y/ci-templates/actions/workflows/ci.yml)
 
 Reusable GitHub Actions workflows for CI/CD pipelines.
 
