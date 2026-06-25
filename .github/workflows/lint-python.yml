@@ -6,7 +6,7 @@ on:
       python-version:
         required: false
         type: string
-        default: '3.12-slim'
+        default: '3.12'
       fail-on-error:
         required: false
         type: boolean
@@ -33,14 +33,13 @@ jobs:
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
           fi
-          # Instalar herramientas de linting
           pip install ruff bandit mypy
 
       - name: Run Ruff (Lint + Format)
         run: |
           echo "Running Ruff lint..."
           ruff check . --output-format=github
-          
+
           echo "Running Ruff format check..."
           ruff format --check .
 
@@ -49,16 +48,11 @@ jobs:
           echo "Running Bandit security scan..."
           bandit -r . --severity-level high --confidence-level high || true
 
-      - name: Run MyPy (Type Checking) - Optional
+      - name: Run MyPy (Type Checking)
         run: |
-          echo "Running MyPy (type checking)..."
+          echo "Running MyPy..."
           if [ -f pyproject.toml ] || [ -f setup.py ] || [ -f mypy.ini ]; then
             mypy . --ignore-missing-imports || true
           else
             echo "MyPy config not found, skipping..."
           fi
-
-      - name: Summary
-        if: always()
-        run: |
-          echo "Python linting workflow completed"

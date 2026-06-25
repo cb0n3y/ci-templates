@@ -3,10 +3,6 @@ name: Lint Bash
 on:
   workflow_call:
     inputs:
-      bash-version:
-        required: false
-        type: string
-        default: 'latest'
       fail-on-error:
         required: false
         type: boolean
@@ -28,25 +24,14 @@ jobs:
 
       - name: Run ShellCheck
         run: |
-          echo "Running ShellCheck on all .sh files..."
-          
-          # Encuentra todos los scripts bash
-          if ! find . -type f \( -name "*.sh" -o -name "*.bash" \) -not -path "./.git/*" -not -path "./venv/*" | xargs -r shellcheck -x; then
+          echo "Running ShellCheck..."
+
+          if ! find . -type f \( -name "*.sh" -o -name "*.bash" \) \
+                     -not -path "./.git/*" -not -path "./venv/*" | xargs -r shellcheck -x; then
             echo "ShellCheck found issues!"
             if [[ "${{ inputs.fail-on-error }}" == "true" ]]; then
               exit 1
             fi
           else
-            echo "ShellCheck passed successfully."
+            echo "ShellCheck passed."
           fi
-
-      - name: Check shebang and executability
-        run: |
-          echo "🔍 Checking shebang and permissions..."
-          find . -type f \( -name "*.sh" -o -name "*.bash" \) -not -path "./.git/*" | while read -r file; do
-            if head -n 1 "$file" | grep -qE '^#!.*(bash|sh)'; then
-              if [ ! -x "$file" ]; then
-                echo "Warning: $file has shebang but is not executable"
-              fi
-            fi
-          done
