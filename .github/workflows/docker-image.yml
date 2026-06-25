@@ -2,10 +2,12 @@
 name: Docker Image CI
 
 on:
-  push:
-    branches: [ $default-branch ]
-  pull_request:
-    branches: [ $default-branch ]
+  workflow_call:
+    inputs:
+      fail-on-error:
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   build:
