@@ -18,9 +18,6 @@ jobs:
       - name: Install yamllint
         run: pip install yamllint
 
-      - name: Lint YAML files
-        run: yamllint -c .yamllint .
-      
       - name: Debug
         run: |
           pwd
@@ -29,3 +26,6 @@ jobs:
           cat .yamllint
           echo "===== yamllint version ====="
           yamllint --version
+
+      - name: Lint YAML files
+        run: yamllint -c .yamllint .
