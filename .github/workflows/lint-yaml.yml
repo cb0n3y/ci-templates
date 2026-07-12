@@ -1,23 +1,22 @@
----
-# .github/workflows/lint-python.yml
-name: Lint Python
+name: Lint YAML
 
 on:
-  workflow_call:  # ← Esto lo hace reutilizable
-    inputs:
-      python-version:
-        required: false
-        type: boolean
-        default: true
+  workflow_call:
 
 jobs:
   lint:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ inputs.python-version }}
-      - run: pip install ruff
-      - run: ruff check .
+          python-version: "3.13"
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Lint YAML files
+        run: yamllint .
