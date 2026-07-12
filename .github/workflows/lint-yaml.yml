@@ -2,11 +2,22 @@ name: Lint YAML
 
 on:
   workflow_call:
+    inputs:
+      debug:
+        description: 'Activar modo debug (muestra pwd, ls, config, versión, etc)'
+        required: false
+        default: false
+        type: boolean
+      
+      yamllint-version:
+        description: 'Versión de yamllint a instalar (ej: "1.35.1", "latest")'
+        required: false
+        default: "1.33.0"   # Elige la versión estable que uses localmente
+        type: string
 
 jobs:
   lint:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -16,16 +27,21 @@ jobs:
           python-version: "3.13"
 
       - name: Install yamllint
-        run: pip install yamllint
+        run: pip install yamllint==${{ inputs.yamllint-version }}
 
-      - name: Debug
+      - name: Debug information
+        if: inputs.debug
         run: |
+          echo "===== Debug mode enabled ====="
           pwd
           ls -la
-          echo "===== .yamllint ====="
-          cat .yamllint
+          echo "===== .yamllint config ====="
+          cat .yamllint || echo ".yamllint file not found"
           echo "===== yamllint version ====="
           yamllint --version
+          echo "===== Python environment ====="
+          python --version
+          pip list | grep yamllint
 
       - name: Lint YAML files
         run: yamllint -c .yamllint .
