@@ -2,6 +2,12 @@ name: Lint YAML
 
 on:
   workflow_call:
+    inputs:
+      yamllint-version:
+        description: Version of yamllint to use
+        required: false
+        default: "1.33.0"
+        type: string
 
 jobs:
   lint:
