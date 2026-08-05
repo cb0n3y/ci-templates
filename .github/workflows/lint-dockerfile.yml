@@ -1,0 +1,44 @@
+name: Lint Dockerfiles
+
+on:
+  workflow_call:
+    inputs:
+      fail-on-error:
+        description: Fail the workflow if lint errors are found
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint-dockerfiles:
+    name: Lint Dockerfiles
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          version: v2.12.0
+
+      - name: Run Hadolint
+        shell: bash
+        run: |
+          set -e
+
+          mapfile -t dockerfiles < <(find . -type f -name Dockerfile)
+
+          if [ ${#dockerfiles[@]} -eq 0 ]; then
+            echo "No Dockerfiles found."
+            exit 0
+          fi
+
+          for file in "${dockerfiles[@]}"; do
+            echo "Linting $file"
+            hadolint "$file"
+          done
