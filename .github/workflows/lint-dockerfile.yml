@@ -14,22 +14,27 @@ permissions:
 
 jobs:
   lint-dockerfiles:
-    name: Lint Dockerfiles
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Install Hadolint
-        uses: hadolint/hadolint-action@v3.1.0
-        with:
-          version: v2.12.0
+        run: |
+          HADOLINT_VERSION="v2.12.0"
+
+          curl -fsSL \
+            -o hadolint \
+            "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64"
+
+          chmod +x hadolint
+          sudo mv hadolint /usr/local/bin/
 
       - name: Run Hadolint
+        continue-on-error: ${{ !inputs.fail-on-error }}
         shell: bash
         run: |
-          set -e
+          set -euo pipefail
 
           mapfile -t dockerfiles < <(find . -type f -name Dockerfile)
 
@@ -39,6 +44,6 @@ jobs:
           fi
 
           for file in "${dockerfiles[@]}"; do
-            echo "Linting $file"
+            echo "==> $file"
             hadolint "$file"
           done
