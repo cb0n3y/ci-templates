@@ -8,6 +8,7 @@ on:
         required: false
         default: true
         type: boolean
+
       yamllint-version:
         description: Version of yamllint to use
         required: false
