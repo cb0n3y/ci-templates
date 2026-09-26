@@ -8,10 +8,14 @@ on:
         required: false
         type: boolean
         default: true
+      runs-on:
+        required: false
+        type: string
+        default: ubuntu-latest
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
     steps:
       - uses: actions/checkout@v4
       - name: Build the Docker image
@@ -20,4 +24,4 @@ jobs:
 
       - name: Run tests in the Docker container
         run: |
-          docker run --rm my-image:latest /bin/bash -c "echo 'Running tests
+          docker run --rm my-image:latest /bin/bash -c "echo 'Running tests'"
