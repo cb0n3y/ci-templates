@@ -1,0 +1,41 @@
+name: Lint ZSH
+
+on:
+  workflow_call:
+    inputs:
+      fail-on-error:
+        required: false
+        type: boolean
+        default: true
+      runs-on:
+        required: false
+        type: string
+        default: ubuntu-latest
+
+jobs:
+  lint-zsh:
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq zsh
+      - run: for f in zsh/zshrc zsh/zshrc.d/*.zsh; do zsh -n "$f"; echo "OK $f"; done
+
+  install-test:
+    name: Install on fresh HOME
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq zsh
+      - name: First run
+        run: |
+          export HOME="$RUNNER_TEMP/home" && mkdir -p "$HOME"
+          ./install.sh --no-vscode
+      - name: Second run (must change nothing)
+        run: |
+          export HOME="$RUNNER_TEMP/home"
+          ./install.sh --no-vscode
+          test ! -d "$HOME/.dotfiles-backup" || { echo "A run created backups"; exit 1; }
+      - name: Zsh loads without errors
+        run: |
+          export HOME="$RUNNER_TEMP/home"
+          zsh -i -c 'whence dsh kns >/dev/null && alias gst >/dev/null && echo "zsh OK"'
