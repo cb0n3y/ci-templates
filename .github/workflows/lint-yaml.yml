@@ -3,15 +3,27 @@ name: Lint YAML
 on:
   workflow_call:
     inputs:
+      fail-on-error:
+        description: Whether to fail the workflow on linting errors
+        required: false
+        default: true
+        type: boolean
+
       yamllint-version:
         description: Version of yamllint to use
         required: false
         default: "1.33.0"
         type: string
 
+      runs-on:
+        description: The type of runner to use for the job
+        required: false
+        default: "ubuntu-latest"
+        type: string
+
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
 
     steps:
       - uses: actions/checkout@v4
