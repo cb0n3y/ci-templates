@@ -1,5 +1,8 @@
 name: Lint Dockerfiles
 
+# Reusable workflow: runs hadolint on every Dockerfile in the calling repo.
+# Uses the caller's .hadolint.yaml (repo root) if present.
+
 on:
   workflow_call:
     inputs:
@@ -8,42 +11,85 @@ on:
         required: false
         type: boolean
         default: true
+      runs-on:
+        description: Runner label
+        required: false
+        type: string
+        default: ubuntu-latest
+      path:
+        description: Directory to search for Dockerfiles
+        required: false
+        type: string
+        default: .
+      hadolint-version:
+        description: Hadolint release tag (asset names changed after v2.12.0; this supports >= v2.13)
+        required: false
+        type: string
+        default: v2.15.1
 
 permissions:
   contents: read
 
 jobs:
   lint-dockerfiles:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Hadolint
+        shell: bash
+        env:
+          HADOLINT_VERSION: ${{ inputs.hadolint-version }}
         run: |
-          HADOLINT_VERSION="v2.12.0"
+          set -euo pipefail
 
-          curl -fsSL \
-            -o hadolint \
-            "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64"
+          case "$(uname -m)" in
+            x86_64)        arch=x86_64 ;;
+            aarch64|arm64) arch=arm64 ;;
+            *) echo "Unsupported architecture: $(uname -m)"; exit 1 ;;
+          esac
+          bin="hadolint-linux-${arch}"
+          base="https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}"
 
-          chmod +x hadolint
-          sudo mv hadolint /usr/local/bin/
+          cd "$RUNNER_TEMP"
+          curl -fsSL --retry 3 --max-time 60 -o "$bin" "$base/$bin"
+          curl -fsSL --retry 3 --max-time 30 -o checksums.sha256 "$base/checksums.sha256"
+
+          # Verify the binary before running it
+          grep -E "[ *]${bin}\$" checksums.sha256 | sha256sum -c -
+
+          sudo install -m 755 "$bin" /usr/local/bin/hadolint
+          hadolint --version
 
       - name: Run Hadolint
         continue-on-error: ${{ !inputs.fail-on-error }}
         shell: bash
+        env:
+          SEARCH_PATH: ${{ inputs.path }}
         run: |
           set -euo pipefail
 
-          mapfile -t dockerfiles < <(find . -type f -name Dockerfile)
+          mapfile -d '' dockerfiles < <(find "$SEARCH_PATH" -type f \
+            \( -name 'Dockerfile' -o -name 'Dockerfile.*' -o -name '*.Dockerfile' \) \
+            -not -path '*/.git/*' -print0)
 
           if [ ${#dockerfiles[@]} -eq 0 ]; then
             echo "No Dockerfiles found."
             exit 0
           fi
 
+          # Lint every file, then fail once at the end, so you see all problems in one run
+          status=0
           for file in "${dockerfiles[@]}"; do
-            echo "==> $file"
-            hadolint "$file"
+            echo "::group::==> $file"
+            hadolint "$file" || status=1
+            echo "::endgroup::"
           done
+
+          if [ "$status" -ne 0 ]; then
+            echo "::error::Hadolint found issues in one or more Dockerfiles."
+          else
+            echo "Hadolint passed (${#dockerfiles[@]} file(s))."
+          fi
+          exit "$status"
