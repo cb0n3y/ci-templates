@@ -9,6 +9,11 @@ pipeline {
         }
     }
 
+    options {
+        timeout(time: 15, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -26,6 +31,16 @@ pipeline {
                     pwd
                     ls -lh
                 '''
+            }
+        }
+
+        stages {
+        stage('Lint') {
+            parallel {
+                stage('YAML')    { steps { sh 'scripts/lint-yaml.sh' } }
+                stage('Bash')    { steps { sh 'scripts/lint-bash.sh' } }
+                stage('Python')  { steps { sh 'scripts/lint-python.sh' } }
+                stage('Actions') { steps { sh 'actionlint' } }
             }
         }
     }
