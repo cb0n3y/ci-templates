@@ -34,7 +34,6 @@ pipeline {
             }
         }
 
-        stages {
         stage('Lint') {
             parallel {
                 stage('YAML')    { steps { sh 'scripts/lint-yaml.sh' } }
