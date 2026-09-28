@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             label 'docker-agent'
-            image 'registry02.homelab.internal:8443/jenkins/jenkins-agent:latest'
+            image 'registry02.homelab.internal/jenkins/jenkins-agent:latest'
             registryUrl 'https://registry02.homelab.internal'
             registryCredentialsId 'harbor-credentials'
             alwaysPull true
