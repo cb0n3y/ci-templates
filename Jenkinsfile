@@ -1,6 +1,7 @@
 pipeline {
     agent {
         docker {
+            label 'docker-agent'
             image 'registry02.homelab.internal:8443/jenkins/jenkins-agent:jdk21-patched'
             registryUrl 'https://registry.midominio.com'
             registryCredentialsId 'harbor-credentials'
