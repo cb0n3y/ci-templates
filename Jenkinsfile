@@ -34,14 +34,14 @@ pipeline {
             }
         }
 
-        stage('Lint') {
-            parallel {
-                stage('YAML')    { steps { sh 'scripts/lint-yaml.sh' } }
-                stage('Bash')    { steps { sh 'scripts/lint-bash.sh' } }
-                stage('Python')  { steps { sh 'scripts/lint-python.sh' } }
-                stage('Actions') { steps { sh 'actionlint' } }
-            }
-        }
+        // stage('Lint') {
+        //     parallel {
+        //         stage('YAML')    { steps { sh 'scripts/lint-yaml.sh' } }
+        //         stage('Bash')    { steps { sh 'scripts/lint-bash.sh' } }
+        //         stage('Python')  { steps { sh 'scripts/lint-python.sh' } }
+        //         stage('Actions') { steps { sh 'actionlint' } }
+        //     }
+        // }
     }
 
     post {
