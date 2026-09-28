@@ -4,7 +4,7 @@ pipeline {
             label 'docker-agent'
             image 'registry02.homelab.internal/jenkins/jenkins-agent:latest'
             registryUrl 'https://registry02.homelab.internal'
-            registryCredentialsId 'harbor-credentials'
+            registryCredentialsId 'jx-laptop'
             alwaysPull true
         }
     }
