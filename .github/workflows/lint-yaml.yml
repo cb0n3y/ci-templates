@@ -18,7 +18,7 @@ on:
       runs-on:
         description: The type of runner to use for the job
         required: false
-        default: "ubuntu-latest"
+        default: ubuntu-slim
         type: string
 
 jobs:
