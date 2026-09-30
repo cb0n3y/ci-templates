@@ -11,7 +11,7 @@ on:
 jobs:
   lint-bash:
     name: Lint Bash Scripts
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-bash
 
     steps:
       - name: Checkout repository
